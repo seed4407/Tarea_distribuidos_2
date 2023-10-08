@@ -2,12 +2,12 @@ FROM golang:latest
 
 WORKDIR /app
 
+COPY parametros_de_inicio.txt .
 COPY go.mod .
 COPY servidor_regional ./servidor_regional
 COPY proto ./proto
 
-EXPOSE 50051
-
+EXPOSE 80
 RUN apt-get update
 RUN export PATH=$PATH:/usr/local/go/bin
 RUN apt-get install -y protobuf-compiler
@@ -20,13 +20,10 @@ RUN protoc --go_out=./proto --go_opt=paths=import \
 --go-grpc_out=./proto --go-grpc_opt=paths=import \
  ./proto/*.proto
 
+# RUN go get github.com/streadway/amqp
 
 WORKDIR /app/servidor_regional
 
 RUN go build -o bin .
-
-WORKDIR /app
-
-RUN go get github.com/rabbitmq/amqp091-go
 
 ENTRYPOINT [ "/app/servidor_regional/bin"]

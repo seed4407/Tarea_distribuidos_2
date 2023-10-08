@@ -1,19 +1,21 @@
 # Variables
-IMAGE_NAME = go-containerized:latest
-CONTAINER_NAME = go-containerized:latest
+IMAGE_NAME = region
+CONTAINER_NAME = region
 DOCKERFILE = Dockerfile
 
 # Comandos
 build:
-	docker build -t $(IMAGE_NAME) -f $(DOCKERFILE) .
+	sudo ufw enable
+	sudo ufw reload
+	sudo docker build -t $(IMAGE_NAME) -f $(DOCKERFILE) .
 
-run:
-	docker run -t $(CONTAINER_NAME)
+docker-regional:
+	sudo docker run -p 8080:80 $(CONTAINER_NAME)
 stop:
-	docker stop $(CONTAINER_NAME)
+	sudo docker stop $(CONTAINER_NAME)
 rm:
-	docker rm $(CONTAINER_NAME)
-clean:	stop rm
-	docker rmi $(IMAGE_NAME)
+	sudo docker rm $(CONTAINER_NAME)
+clean:	sudo stop rm
+	sudo docker rmi $(IMAGE_NAME)
 logs:
-	docker logs -f $(CONTAINER_NAME)
+	sudo docker logs -f $(CONTAINER_NAME)
