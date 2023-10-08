@@ -14,20 +14,20 @@
 
 syntax = "proto3";
 
-option go_package = "github.com/seed4407/Tarea_Distribuidos";
+option go_package = "github.com/seed4407/Tarea_distribuidos_2";
 option java_multiple_files = true;
 option java_package = "io.grpc.examples.helloworld";
 option java_outer_classname = "HelloWorldProto";
 
 package grpc;
 
-service ServidorRegional{
-    rpc CuposDisponibles (Cupo) returns (Recepcion) {}
+service NameNode{
+    rpc Recepcion_Info (Persona) returns (Recepcion) {}
     rpc CuposRechazados (Rechazado) returns (Recepcion) {}
 }
 
-message Cupo{
-    string cupos = 1;
+message Persona{
+    string info = 1;
 }
 
 message Recepcion{

@@ -2,9 +2,9 @@ FROM golang:latest
 
 WORKDIR /app
 
-COPY parametros_de_inicio.txt .
+COPY Data.txt .
 COPY go.mod .
-COPY servidor_regional ./servidor_regional
+COPY OMS ./OMS
 COPY proto ./proto
 
 EXPOSE 80
@@ -22,8 +22,8 @@ RUN protoc --go_out=./proto --go_opt=paths=import \
 
 # RUN go get github.com/streadway/amqp
 
-WORKDIR /app/servidor_regional
+WORKDIR /app/OMS
 
 RUN go build -o bin .
 
-ENTRYPOINT [ "/app/servidor_regional/bin"]
+ENTRYPOINT [ "/app/OMS/bin"]

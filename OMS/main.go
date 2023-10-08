@@ -53,21 +53,12 @@ type server struct {
 	pb.UnimplementedServidorRegionalServer
 }
 
-func (s *server) CuposDisponibles(ctx context.Context, in *pb.Cupo) (*pb.Recepcion, error) {
-	datos_cupos, err = strconv.Atoi(in.GetCupos())
+func (s *server) Recepcion_Info(ctx context.Context, in *pb.Persona) (*pb.Recepcion, error) {
+	var datos_persona, err = strconv.Atoi(in.GetPersonas())
 	if err != nil {
         log.Printf("Error %v\n", err)
     }
-	valor_modificado = valor_inicial
-	limite_inferior = (valor_modificado/2) - (valor_modificado/5)
-	limite_superior = (valor_modificado/2) + (valor_modificado/5)
-	if valor_modificado == 0 {
-		numeroAleatorio = 0
-	} else if valor_modificado == 1{
-		numeroAleatorio = 1
-	} else {
-		numeroAleatorio = rand.Intn(limite_superior-limite_inferior+1) + limite_inferior
-	}
+	
 	log.Printf("Hay %d personas interesadas en acceder a la beta",numeroAleatorio)
 	aux = strconv.Itoa(numeroAleatorio)
 
@@ -90,7 +81,7 @@ func (s *server) CuposRechazados(ctx context.Context, in *pb.Rechazado) (*pb.Rec
 func main() {
 	rand.Seed(time.Now().UnixNano())
     // Abrir el archivo en modo lectura
-	filePath := "/app/parametros_de_inicio.txt"
+	filePath := "/app/Data.txt"
 
     // Lee el contenido del archivo
     contenido, err := os.ReadFile(filePath)
@@ -104,52 +95,15 @@ func main() {
 	if valor_inicial >= 0{
 		log.Printf("Inicio exitoso")
 	}
-
-	// conn, err := amqp.Dial("amqp://guest:guest@10.6.46.109:8082/")
-    // if err != nil {
-    //     log.Fatalf("No se pudo conectar a RabbitMQ: %v", err)
-    // }
-    // defer conn.Close()
-
-    // ch, err := conn.Channel()
-    // if err != nil {
-    //     log.Fatalf("No se pudo abrir un canal: %v", err)
-    // }
-    // defer ch.Close()
-
-    // // Debugger
-    // fmt.Println("Conexión exitosa a RabbitMQ")
 	
-	// serverID := "server-1"
-
-	//     // Mensaje a enviar
-    // message := "Mensaje guardado en cola"
-
-    // err = ch.Publish(
-    //     "",     // Exchange
-    //     "centralQueue", // Nombre de la cola
-    //     false,  // Mandatory
-    //     false,  // Immediate
-    //     amqp.Publishing{
-    //         ContentType: "text/plain",
-    //         Body:        []byte(message),
-    //         Headers:     amqp.Table{"server_id": serverID},
-    //     })
-    // if err != nil {
-    //     log.Fatalf("No se pudo publicar el mensaje: %v", err)
-    // }
-
-    // // Debugger
-    // fmt.Println("Mensaje publicado exitosamente en la cola 'central-queue'")
-	
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d",*port))
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	s := grpc.NewServer()
-	pb.RegisterServidorRegionalServer(s, &server{})
-	log.Printf("server listening at %v", lis.Addr())
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+	// lis, err := net.Listen("tcp", fmt.Sprintf(":%d",*port))
+	// if err != nil {
+	// 	log.Fatalf("failed to listen: %v", err)
+	// }
+	// s := grpc.NewServer()
+	// pb.RegisterServidorRegionalServer(s, &server{})
+	// log.Printf("server listening at %v", lis.Addr())
+	// if err := s.Serve(lis); err != nil {
+	// 	log.Fatalf("failed to serve: %v", err)
+	// }
 }
