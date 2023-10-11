@@ -24,14 +24,14 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"net" 
+	// "net" 
     "os"
 	"math/rand"
 	"time"
 	"strconv"
-	"google.golang.org/grpc"
+	// "google.golang.org/grpc"
 	// "github.com/streadway/amqp"
-	pb "github.com/seed4407/Tarea_Distribuidos/proto"
+	pb "github.com/seed4407/Tarea_distribuidos_2/proto"
 )
 
 var (
@@ -50,15 +50,15 @@ var aux string
 // var ch *amqp.Channel
 // server is used to implement helloworld.GreeterServer.
 type server struct {
-	pb.UnimplementedServidorRegionalServer
+	pb.UnimplementedNameNodeServer
 }
 
 func (s *server) Recepcion_Info(ctx context.Context, in *pb.Persona) (*pb.Recepcion, error) {
-	var datos_persona, err = strconv.Atoi(in.GetPersonas())
+	var datos_persona, err = strconv.Atoi(in.GetInfo())
 	if err != nil {
         log.Printf("Error %v\n", err)
     }
-	
+	log.Printf(strconv.Itoa(datos_persona))
 	log.Printf("Hay %d personas interesadas en acceder a la beta",numeroAleatorio)
 	aux = strconv.Itoa(numeroAleatorio)
 

@@ -27,3 +27,7 @@ WORKDIR /app/OMS
 RUN go build -o bin .
 
 ENTRYPOINT [ "/app/OMS/bin"]
+
+# Compiladores proto .pb y grpc.pb
+# protoc --go_out=. --go-grpc_out=. *.proto
+# protoc --go_out=. *.proto

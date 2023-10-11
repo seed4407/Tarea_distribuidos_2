@@ -4,7 +4,7 @@
 // - protoc             v3.12.4
 // source: mess.proto
 
-package proto
+package Tarea_distribuidos_2
 
 import (
 	context "context"
@@ -18,122 +18,122 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// ServidorRegionalClient is the client API for ServidorRegional service.
+// NameNodeClient is the client API for NameNode service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ServidorRegionalClient interface {
-	CuposDisponibles(ctx context.Context, in *Cupo, opts ...grpc.CallOption) (*Recepcion, error)
+type NameNodeClient interface {
+	Recepcion_Info(ctx context.Context, in *Persona, opts ...grpc.CallOption) (*Recepcion, error)
 	CuposRechazados(ctx context.Context, in *Rechazado, opts ...grpc.CallOption) (*Recepcion, error)
 }
 
-type servidorRegionalClient struct {
+type nameNodeClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewServidorRegionalClient(cc grpc.ClientConnInterface) ServidorRegionalClient {
-	return &servidorRegionalClient{cc}
+func NewNameNodeClient(cc grpc.ClientConnInterface) NameNodeClient {
+	return &nameNodeClient{cc}
 }
 
-func (c *servidorRegionalClient) CuposDisponibles(ctx context.Context, in *Cupo, opts ...grpc.CallOption) (*Recepcion, error) {
+func (c *nameNodeClient) Recepcion_Info(ctx context.Context, in *Persona, opts ...grpc.CallOption) (*Recepcion, error) {
 	out := new(Recepcion)
-	err := c.cc.Invoke(ctx, "/grpc.ServidorRegional/CuposDisponibles", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/grpc.NameNode/Recepcion_Info", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *servidorRegionalClient) CuposRechazados(ctx context.Context, in *Rechazado, opts ...grpc.CallOption) (*Recepcion, error) {
+func (c *nameNodeClient) CuposRechazados(ctx context.Context, in *Rechazado, opts ...grpc.CallOption) (*Recepcion, error) {
 	out := new(Recepcion)
-	err := c.cc.Invoke(ctx, "/grpc.ServidorRegional/CuposRechazados", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/grpc.NameNode/CuposRechazados", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ServidorRegionalServer is the server API for ServidorRegional service.
-// All implementations must embed UnimplementedServidorRegionalServer
+// NameNodeServer is the server API for NameNode service.
+// All implementations must embed UnimplementedNameNodeServer
 // for forward compatibility
-type ServidorRegionalServer interface {
-	CuposDisponibles(context.Context, *Cupo) (*Recepcion, error)
+type NameNodeServer interface {
+	Recepcion_Info(context.Context, *Persona) (*Recepcion, error)
 	CuposRechazados(context.Context, *Rechazado) (*Recepcion, error)
-	mustEmbedUnimplementedServidorRegionalServer()
+	mustEmbedUnimplementedNameNodeServer()
 }
 
-// UnimplementedServidorRegionalServer must be embedded to have forward compatible implementations.
-type UnimplementedServidorRegionalServer struct {
+// UnimplementedNameNodeServer must be embedded to have forward compatible implementations.
+type UnimplementedNameNodeServer struct {
 }
 
-func (UnimplementedServidorRegionalServer) CuposDisponibles(context.Context, *Cupo) (*Recepcion, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CuposDisponibles not implemented")
+func (UnimplementedNameNodeServer) Recepcion_Info(context.Context, *Persona) (*Recepcion, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Recepcion_Info not implemented")
 }
-func (UnimplementedServidorRegionalServer) CuposRechazados(context.Context, *Rechazado) (*Recepcion, error) {
+func (UnimplementedNameNodeServer) CuposRechazados(context.Context, *Rechazado) (*Recepcion, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CuposRechazados not implemented")
 }
-func (UnimplementedServidorRegionalServer) mustEmbedUnimplementedServidorRegionalServer() {}
+func (UnimplementedNameNodeServer) mustEmbedUnimplementedNameNodeServer() {}
 
-// UnsafeServidorRegionalServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ServidorRegionalServer will
+// UnsafeNameNodeServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to NameNodeServer will
 // result in compilation errors.
-type UnsafeServidorRegionalServer interface {
-	mustEmbedUnimplementedServidorRegionalServer()
+type UnsafeNameNodeServer interface {
+	mustEmbedUnimplementedNameNodeServer()
 }
 
-func RegisterServidorRegionalServer(s grpc.ServiceRegistrar, srv ServidorRegionalServer) {
-	s.RegisterService(&ServidorRegional_ServiceDesc, srv)
+func RegisterNameNodeServer(s grpc.ServiceRegistrar, srv NameNodeServer) {
+	s.RegisterService(&NameNode_ServiceDesc, srv)
 }
 
-func _ServidorRegional_CuposDisponibles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Cupo)
+func _NameNode_Recepcion_Info_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Persona)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServidorRegionalServer).CuposDisponibles(ctx, in)
+		return srv.(NameNodeServer).Recepcion_Info(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc.ServidorRegional/CuposDisponibles",
+		FullMethod: "/grpc.NameNode/Recepcion_Info",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServidorRegionalServer).CuposDisponibles(ctx, req.(*Cupo))
+		return srv.(NameNodeServer).Recepcion_Info(ctx, req.(*Persona))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ServidorRegional_CuposRechazados_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _NameNode_CuposRechazados_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Rechazado)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ServidorRegionalServer).CuposRechazados(ctx, in)
+		return srv.(NameNodeServer).CuposRechazados(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/grpc.ServidorRegional/CuposRechazados",
+		FullMethod: "/grpc.NameNode/CuposRechazados",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ServidorRegionalServer).CuposRechazados(ctx, req.(*Rechazado))
+		return srv.(NameNodeServer).CuposRechazados(ctx, req.(*Rechazado))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// ServidorRegional_ServiceDesc is the grpc.ServiceDesc for ServidorRegional service.
+// NameNode_ServiceDesc is the grpc.ServiceDesc for NameNode service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ServidorRegional_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "grpc.ServidorRegional",
-	HandlerType: (*ServidorRegionalServer)(nil),
+var NameNode_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "grpc.NameNode",
+	HandlerType: (*NameNodeServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CuposDisponibles",
-			Handler:    _ServidorRegional_CuposDisponibles_Handler,
+			MethodName: "Recepcion_Info",
+			Handler:    _NameNode_Recepcion_Info_Handler,
 		},
 		{
 			MethodName: "CuposRechazados",
-			Handler:    _ServidorRegional_CuposRechazados_Handler,
+			Handler:    _NameNode_CuposRechazados_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
