@@ -26,8 +26,9 @@ import (
 	"log"
 	// "net" 
     "os"
-	"math/rand"
-	"time"
+	"bufio"
+	// "math/rand"
+	// "time"
 	"strconv"
 	// "google.golang.org/grpc"
 	// "github.com/streadway/amqp"
@@ -38,10 +39,11 @@ var (
 	port = flag.Int("port", 80, "The server port")
 )
 
+var id_datos int
 var datos_cupos int 
 var err error
 var datos_rechazados int 
-var valor_inicial int
+// var valor_inicial string
 var valor_modificado int
 var numeroAleatorio int
 var limite_inferior int
@@ -53,49 +55,92 @@ type server struct {
 	pb.UnimplementedNameNodeServer
 }
 
-func (s *server) Recepcion_Info(ctx context.Context, in *pb.Persona) (*pb.Recepcion, error) {
-	var datos_persona, err = strconv.Atoi(in.GetInfo())
+func (s *server) Recepcion_Info(ctx context.Context, in *pb.Datos) (*pb.Recepcion, error) {
+	var datos_persona = in.GetApellido()
+	var nodo int
+	filePath := "/app/Data.txt"
+
+	if datos_persona[0] <= 77 {
+		log.Printf("enviar a datanode1")
+		nodo = 1
+	} else{
+		log.Printf("enviar a datanode2")
+		nodo = 2
+	}
+
+	dato_escribir := strconv.Itoa(id_datos) + " " + strconv.Itoa(nodo) + " " +  in.GetEstado()
+	id_datos = id_datos + 1
+
+	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+
+	//Se escribe en archivo
+	_, err = file.WriteString(dato_escribir + "\\n")
 	if err != nil {
-        log.Printf("Error %v\n", err)
-    }
-	log.Printf(strconv.Itoa(datos_persona))
-	log.Printf("Hay %d personas interesadas en acceder a la beta",numeroAleatorio)
-	aux = strconv.Itoa(numeroAleatorio)
+		return nil, err
+	}
+	
+	err = file.Sync()
+	if err != nil {
+		return nil, err
+	}
+	file.Close()
 
 	return &pb.Recepcion{Ok:aux}, nil
 }
 
-func (s *server) CuposRechazados(ctx context.Context, in *pb.Rechazado) (*pb.Recepcion, error) {
-	datos_rechazados, err = strconv.Atoi(in.GetRechazados())
-	if err != nil {
-        log.Printf("Error %v\n", err)
-    }
-	valor_inicial = valor_inicial - (numeroAleatorio -  datos_rechazados)
-
-	log.Printf("Se inscribieron %d personas",numeroAleatorio -  datos_rechazados)
-	log.Printf("Quedan %d personas en espera de cupo",valor_inicial)
-
-	return &pb.Recepcion{Ok:"ok"}, nil
-}
-
 func main() {
-	rand.Seed(time.Now().UnixNano())
     // Abrir el archivo en modo lectura
 	filePath := "/app/Data.txt"
 
-    // Lee el contenido del archivo
-    contenido, err := os.ReadFile(filePath)
-    if err != nil {
-        fmt.Printf("Error al leer el archivo: %v\n", err)
-        return
+	// var file *os.File
+	//Se verifica que archivo este creado
+	// if _, err = os.Stat(filePath); os.IsNotExist(err) {
+	// 	file, err = os.Create(filePath)
+	// 	if err != nil {
+	// 		return 
+	// 	}
+	// 	file.Close()
+	// }
+
+	//Se abre archivo
+	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+	file.Close()
+
+	//Leer linea por linea
+	file, err = os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
+
+	scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+        fmt.Println(scanner.Text())
     }
 
-	valor_inicial,err = strconv.Atoi(string(contenido))
+	if err = scanner.Err(); err != nil {
+        log.Fatal(err)
+    }
 
-	if valor_inicial >= 0{
-		log.Printf("Inicio exitoso")
-	}
-	
+	file.Close()
+
+	var nodo int 
+	nodo = 1
+	id_datos = 0
+	dato_escribir := strconv.Itoa(id_datos) + " " + strconv.Itoa(nodo) + " " +  "infectado"
+	id_datos = id_datos + 1
+	fmt.Printf(dato_escribir)
+
+    // // Lee el contenido del archivo
+    // contenido, err := os.ReadFile(filePath)
+    // if err != nil {
+    //     fmt.Printf("Error al leer el archivo: %v\n", err)
+    //     return
+    // }
+
+	// valor_inicial = string(contenido)
+	// fmt.Printf(valor_inicial)
+
+	// if valor_inicial >= 0{
+	// 	log.Printf("Inicio exitoso")
+	// }
+
 	// lis, err := net.Listen("tcp", fmt.Sprintf(":%d",*port))
 	// if err != nil {
 	// 	log.Fatalf("failed to listen: %v", err)

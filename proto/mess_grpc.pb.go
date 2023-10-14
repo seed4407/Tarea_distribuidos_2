@@ -22,8 +22,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type NameNodeClient interface {
-	Recepcion_Info(ctx context.Context, in *Persona, opts ...grpc.CallOption) (*Recepcion, error)
-	CuposRechazados(ctx context.Context, in *Rechazado, opts ...grpc.CallOption) (*Recepcion, error)
+	Recepcion_Info(ctx context.Context, in *Datos, opts ...grpc.CallOption) (*Recepcion, error)
 }
 
 type nameNodeClient struct {
@@ -34,18 +33,9 @@ func NewNameNodeClient(cc grpc.ClientConnInterface) NameNodeClient {
 	return &nameNodeClient{cc}
 }
 
-func (c *nameNodeClient) Recepcion_Info(ctx context.Context, in *Persona, opts ...grpc.CallOption) (*Recepcion, error) {
+func (c *nameNodeClient) Recepcion_Info(ctx context.Context, in *Datos, opts ...grpc.CallOption) (*Recepcion, error) {
 	out := new(Recepcion)
 	err := c.cc.Invoke(ctx, "/grpc.NameNode/Recepcion_Info", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *nameNodeClient) CuposRechazados(ctx context.Context, in *Rechazado, opts ...grpc.CallOption) (*Recepcion, error) {
-	out := new(Recepcion)
-	err := c.cc.Invoke(ctx, "/grpc.NameNode/CuposRechazados", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -56,8 +46,7 @@ func (c *nameNodeClient) CuposRechazados(ctx context.Context, in *Rechazado, opt
 // All implementations must embed UnimplementedNameNodeServer
 // for forward compatibility
 type NameNodeServer interface {
-	Recepcion_Info(context.Context, *Persona) (*Recepcion, error)
-	CuposRechazados(context.Context, *Rechazado) (*Recepcion, error)
+	Recepcion_Info(context.Context, *Datos) (*Recepcion, error)
 	mustEmbedUnimplementedNameNodeServer()
 }
 
@@ -65,11 +54,8 @@ type NameNodeServer interface {
 type UnimplementedNameNodeServer struct {
 }
 
-func (UnimplementedNameNodeServer) Recepcion_Info(context.Context, *Persona) (*Recepcion, error) {
+func (UnimplementedNameNodeServer) Recepcion_Info(context.Context, *Datos) (*Recepcion, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Recepcion_Info not implemented")
-}
-func (UnimplementedNameNodeServer) CuposRechazados(context.Context, *Rechazado) (*Recepcion, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CuposRechazados not implemented")
 }
 func (UnimplementedNameNodeServer) mustEmbedUnimplementedNameNodeServer() {}
 
@@ -85,7 +71,7 @@ func RegisterNameNodeServer(s grpc.ServiceRegistrar, srv NameNodeServer) {
 }
 
 func _NameNode_Recepcion_Info_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Persona)
+	in := new(Datos)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -97,25 +83,7 @@ func _NameNode_Recepcion_Info_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: "/grpc.NameNode/Recepcion_Info",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NameNodeServer).Recepcion_Info(ctx, req.(*Persona))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _NameNode_CuposRechazados_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Rechazado)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(NameNodeServer).CuposRechazados(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/grpc.NameNode/CuposRechazados",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NameNodeServer).CuposRechazados(ctx, req.(*Rechazado))
+		return srv.(NameNodeServer).Recepcion_Info(ctx, req.(*Datos))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -130,10 +98,6 @@ var NameNode_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Recepcion_Info",
 			Handler:    _NameNode_Recepcion_Info_Handler,
-		},
-		{
-			MethodName: "CuposRechazados",
-			Handler:    _NameNode_CuposRechazados_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
