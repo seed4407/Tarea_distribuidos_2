@@ -24,6 +24,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"strings"
 	// "net" 
     "os"
 	"bufio"
@@ -40,17 +41,9 @@ var (
 )
 
 var id_datos int
-var datos_cupos int 
 var err error
-var datos_rechazados int 
-// var valor_inicial string
-var valor_modificado int
-var numeroAleatorio int
-var limite_inferior int
-var limite_superior int
 var aux string
-// var ch *amqp.Channel
-// server is used to implement helloworld.GreeterServer.
+
 type server struct {
 	pb.UnimplementedNameNodeServer
 }
@@ -88,9 +81,64 @@ func (s *server) Recepcion_Info(ctx context.Context, in *pb.Datos) (*pb.Recepcio
 	return &pb.Recepcion{Ok:aux}, nil
 }
 
+func (s *server) Solicitud_Info_ONU(ctx context.Context, in *pb.Estado_Persona) (*pb.Recepcion, error) {
+	var estado_persona = in.GetEstado()
+	var linea_data string
+	var id []string
+
+	filePath := "/app/Data.txt"
+	var file *os.File
+
+	file, err = os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
+
+	scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+		linea_data = scanner.Text() 
+        fmt.Println(linea_data)
+		if strings.Contains(linea_data, estado_persona) {
+			id = append(id,strings.Split(linea_data, " ")[0])
+		}
+    }
+
+	//llamar a funcion para solicitar a dataNode y se retorna lo que devuelva
+
+	if err = scanner.Err(); err != nil {
+        log.Fatal(err)
+    }
+
+	file.Close()
+	
+	// return &pb.Lista_Datos_DataNode{[Datos_DataNode:{nombre:aux,apellido:aux}]}, nil
+	return &pb.Recepcion{Ok:aux}, nil
+}
+
+
 func main() {
     // Abrir el archivo en modo lectura
 	filePath := "/app/Data.txt"
+
+	var linea_data string
+	var id []string
+	var estado_persona = "Infectado"
+	var file *os.File
+
+	file, err = os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
+
+	scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+		linea_data = scanner.Text() 
+		if strings.Contains(linea_data, estado_persona) {
+			id = append(id,strings.Split(linea_data, " ")[0])
+		}
+    }
+	if(linea_data == ""){
+		id_datos = 1
+	} else{
+		id_datos, err = strconv.Atoi(strings.Split(linea_data, " ")[0])
+		id_datos = id_datos + 1
+	}
+	fmt.Println(id_datos)
+	fmt.Println(id)
 
 	// var file *os.File
 	//Se verifica que archivo este creado
@@ -102,30 +150,30 @@ func main() {
 	// 	file.Close()
 	// }
 
-	//Se abre archivo
-	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
-	file.Close()
+	// //Se abre archivo
+	// file, err := os.OpenFile(filePath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
+	// file.Close()
 
-	//Leer linea por linea
-	file, err = os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
+	// //Leer linea por linea
+	// file, err = os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
 
-	scanner := bufio.NewScanner(file)
-    for scanner.Scan() {
-        fmt.Println(scanner.Text())
-    }
+	// scanner := bufio.NewScanner(file)
+    // for scanner.Scan() {
+    //     fmt.Println(scanner.Text())
+    // }
 
-	if err = scanner.Err(); err != nil {
-        log.Fatal(err)
-    }
+	// if err = scanner.Err(); err != nil {
+    //     log.Fatal(err)
+    // }
 
-	file.Close()
+	// file.Close()
 
-	var nodo int 
-	nodo = 1
-	id_datos = 0
-	dato_escribir := strconv.Itoa(id_datos) + " " + strconv.Itoa(nodo) + " " +  "infectado"
-	id_datos = id_datos + 1
-	fmt.Printf(dato_escribir)
+	// var nodo int 
+	// nodo = 1
+	// id_datos = 0
+	// dato_escribir := strconv.Itoa(id_datos) + " " + strconv.Itoa(nodo) + " " +  "infectado"
+	// id_datos = id_datos + 1
+	// fmt.Printf(dato_escribir)
 
     // // Lee el contenido del archivo
     // contenido, err := os.ReadFile(filePath)
