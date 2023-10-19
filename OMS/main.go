@@ -31,7 +31,7 @@ import (
 	// "math/rand"
 	// "time"
 	"strconv"
-	// "google.golang.org/grpc"
+	"google.golang.org/grpc"
 	// "github.com/streadway/amqp"
 	pb "github.com/seed4407/Tarea_distribuidos_2/proto"
 )
