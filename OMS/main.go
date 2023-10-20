@@ -48,7 +48,7 @@ type server struct {
 	pb.UnimplementedNameNodeServer
 }
 
-func enviarDatosAlDataNode(dataNodeAddr string, id string, informe *pb.datos) {
+func enviarDatosAlDataNode(dataNodeAddr string, id string, informe *pb.Datos) {
     conn, err := grpc.Dial(dataNodeAddr, grpc.WithInsecure())
     if err != nil {
         log.Fatalf("No se pudo conectar al DataNode: %v", err)
@@ -73,11 +73,11 @@ func (s *server) Recepcion_Info(ctx context.Context, in *pb.Datos) (*pb.Recepcio
 	filePath := "/app/Data.txt"
 
 	if datos_persona[0] <= 77 {
-		enviarDatosAlDataNode("10.6.46.109:8080",id_datos,in)
+		enviarDatosAlDataNode("10.6.46.109:8080",strconv.Itoa(id_datos),in)
 		log.Printf("enviar a datanode1")
 		nodo = 1
 	} else{
-		enviarDatosAlDataNode("10.6.46.110:8080",id_datos,in)
+		enviarDatosAlDataNode("10.6.46.110:8080",strconv.Itoa(id_datos),in)
 		log.Printf("enviar a datanode2")
 		nodo = 2
 	}
@@ -119,9 +119,9 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
         fmt.Println(linea_data)
 		if strings.Contains(linea_data, estado_persona) {
 			if strings.Contains(linea_data, " 1 ") {
-				id_1 = append(id,strings.Split(linea_data, " ")[0])
+				id_1 = append(id_1,strings.Split(linea_data, " ")[0])
 			} else {
-				id_2 = append(id,strings.Split(linea_data, " ")[0])
+				id_2 = append(id_2,strings.Split(linea_data, " ")[0])
 			}
 		}
     }
@@ -134,7 +134,7 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
 
 	//llamar a funcion para solicitar a dataNode y se retorna lo que devuelva
 
-	conn, err := grpc.Dial("10.6.46.109:8080",grpc.WhitInsecure())
+	conn, err := grpc.Dial("10.6.46.109:8080",grpc.WithInsecure())
 
 	if err != nil {
         log.Fatal(err)
@@ -145,7 +145,7 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
 	datanode := pb.NewDataNodeClient(conn)
     ctx, cancel := context.WithTimeout(context.Background(), time.Second)
     defer cancel()
-    respuesta, err := datanode.Solicitud_Info_DataNode(ctx, &pb.Id{Lista_id: id_1})
+    respuesta, err := datanode.Solicitud_Info_DataNode(ctx, &pb.Id{ListaId: id_1})
     if err != nil{
         log.Print("No hay respuesta del datanode1")
     }else{
@@ -153,7 +153,7 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
         // log.Printf("%s", respuesta.Lista_datos_DataNode)
     }
 
-	conn, err = grpc.Dial("10.6.46.110:8080",grpc.WhitInsecure())
+	conn, err = grpc.Dial("10.6.46.110:8080",grpc.WithInsecure())
 
 	if err != nil {
         log.Fatal(err)
@@ -164,7 +164,7 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
 	datanode = pb.NewDataNodeClient(conn)
     ctx, cancel = context.WithTimeout(context.Background(), time.Second)
     defer cancel()
-    respuesta, err = datanode.Solicitud_Info_DataNode(ctx, &pb.Id{Lista_id: id_2})
+    respuesta, err = datanode.Solicitud_Info_DataNode(ctx, &pb.Id{ListaId: id_2})
     if err != nil{
         log.Print("No hay respuesta del datanode2")
     }else{
