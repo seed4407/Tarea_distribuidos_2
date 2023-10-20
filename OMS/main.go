@@ -29,7 +29,7 @@ import (
     "os"
 	"bufio"
 	// "math/rand"
-	// "time"
+	"time"
 	"strconv"
 	"google.golang.org/grpc"
 	// "github.com/streadway/amqp"
@@ -48,15 +48,36 @@ type server struct {
 	pb.UnimplementedNameNodeServer
 }
 
+func enviarDatosAlDataNode(dataNodeAddr string, id string, informe *pb.datos) {
+    conn, err := grpc.Dial(dataNodeAddr, grpc.WithInsecure())
+    if err != nil {
+        log.Fatalf("No se pudo conectar al DataNode: %v", err)
+    }
+    defer conn.Close()
+
+    client := pb.NewDataNodeClient(conn)
+
+    _, err = client.RegistrarNombre(context.Background(), &pb.Registro{
+        Id:       id,
+        Nombre:   informe.Nombre,
+        Apellido: informe.Apellido,
+    })
+    if err != nil {
+        log.Fatalf("Error al registrar nombre en el DataNode: %v", err)
+    }
+}
+
 func (s *server) Recepcion_Info(ctx context.Context, in *pb.Datos) (*pb.Recepcion, error) {
 	var datos_persona = in.GetApellido()
 	var nodo int
 	filePath := "/app/Data.txt"
 
 	if datos_persona[0] <= 77 {
+		enviarDatosAlDataNode("10.6.46.109:8080",id_datos,in)
 		log.Printf("enviar a datanode1")
 		nodo = 1
 	} else{
+		enviarDatosAlDataNode("10.6.46.110:8080",id_datos,in)
 		log.Printf("enviar a datanode2")
 		nodo = 2
 	}
@@ -81,10 +102,11 @@ func (s *server) Recepcion_Info(ctx context.Context, in *pb.Datos) (*pb.Recepcio
 	return &pb.Recepcion{Ok:aux}, nil
 }
 
-func (s *server) Solicitud_Info_ONU(ctx context.Context, in *pb.Estado_Persona) (*pb.Recepcion, error) {
+func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*pb.Lista_Datos_DataNode, error) {
 	var estado_persona = in.GetEstado()
 	var linea_data string
-	var id []string
+	var id_1 []string
+	var id_2 []string
 
 	filePath := "/app/Data.txt"
 	var file *os.File
@@ -96,20 +118,62 @@ func (s *server) Solicitud_Info_ONU(ctx context.Context, in *pb.Estado_Persona) 
 		linea_data = scanner.Text() 
         fmt.Println(linea_data)
 		if strings.Contains(linea_data, estado_persona) {
-			id = append(id,strings.Split(linea_data, " ")[0])
+			if strings.Contains(linea_data, " 1 ") {
+				id_1 = append(id,strings.Split(linea_data, " ")[0])
+			} else {
+				id_2 = append(id,strings.Split(linea_data, " ")[0])
+			}
 		}
     }
-
-	//llamar a funcion para solicitar a dataNode y se retorna lo que devuelva
-
+	
 	if err = scanner.Err(); err != nil {
         log.Fatal(err)
     }
 
 	file.Close()
-	
+
+	//llamar a funcion para solicitar a dataNode y se retorna lo que devuelva
+
+	conn, err := grpc.Dial("10.6.46.109:8080",grpc.WhitInsecure())
+
+	if err != nil {
+        log.Fatal(err)
+    }
+
+	defer conn.Close()
+
+	datanode := pb.NewDataNodeClient(conn)
+    ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+    defer cancel()
+    respuesta, err := datanode.Solicitud_Info_DataNode(ctx, &pb.Id{Lista_id: id_1})
+    if err != nil{
+        log.Print("No hay respuesta del datanode1")
+    }else{
+		fmt.Println(respuesta.Datos)
+        // log.Printf("%s", respuesta.Lista_datos_DataNode)
+    }
+
+	conn, err = grpc.Dial("10.6.46.110:8080",grpc.WhitInsecure())
+
+	if err != nil {
+        log.Fatal(err)
+    }
+
+	defer conn.Close()
+
+	datanode = pb.NewDataNodeClient(conn)
+    ctx, cancel = context.WithTimeout(context.Background(), time.Second)
+    defer cancel()
+    respuesta, err = datanode.Solicitud_Info_DataNode(ctx, &pb.Id{Lista_id: id_2})
+    if err != nil{
+        log.Print("No hay respuesta del datanode2")
+    }else{
+		fmt.Println(respuesta.Datos)
+        // log.Printf("%s", respuesta.Lista_datos_DataNode)
+    }
+
 	// return &pb.Lista_Datos_DataNode{[Datos_DataNode:{nombre:aux,apellido:aux}]}, nil
-	return &pb.Recepcion{Ok:aux}, nil
+	return &pb.Lista_Datos_DataNode{Datos:respuesta.Datos}, nil
 }
 
 
