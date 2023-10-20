@@ -88,7 +88,7 @@ func (s *server) Recepcion_Info(ctx context.Context, in *pb.Datos) (*pb.Recepcio
 	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
 
 	//Se escribe en archivo
-	_, err = file.WriteString(dato_escribir + "\\n")
+	_, err = file.WriteString(dato_escribir + "\n")
 	if err != nil {
 		return nil, err
 	}
