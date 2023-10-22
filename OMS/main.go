@@ -57,7 +57,7 @@ func enviarDatosAlDataNode(dataNodeAddr string, id string, informe *pb.Datos) {
     }
     defer conn.Close()
 
-	fmt.Println("Respuesta recibida",id, informe)
+	fmt.Println("Dato enviada a DataNode",id, informe)
     client := pb.NewDataNodeClient(conn)
 
     _, err = client.RegistrarNombre(context.Background(), &pb.Registro{
@@ -108,7 +108,7 @@ func (s *server) Recepcion_Info(ctx context.Context, in *pb.Datos) (*pb.Recepcio
 
 func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*pb.Lista_Datos_DataNode, error) {
 	// var estado_persona = in.GetEstado()
-    var estado_persona = string.ToUpper(in.Estado)
+    var estado_persona = strings.ToUpper(in.Estado)
 	fmt.Println("Respuesta recibida",estado_persona)
 	var linea_data string
 	var id_1 []string
@@ -155,11 +155,11 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
 	datanode := pb.NewDataNodeClient(conn)
     ctx, cancel := context.WithTimeout(context.Background(), time.Second)
     defer cancel()
-    respuesta, err := datanode.Solicitud_Info_DataNode(ctx, &pb.Id{ListaId: id_1})
+    respuesta1, err := datanode.Solicitud_Info_DataNode(ctx, &pb.Id{ListaId: id_1})
     if err != nil{
         log.Print("No hay respuesta del datanode1")
     }else{
-		fmt.Println("Respuesta recibida de DataNode2",respuesta.Datos)
+		fmt.Println("Respuesta recibida de DataNode1",respuesta1.Datos)
         // log.Printf("%s", respuesta.Lista_datos_DataNode)
     }
 
@@ -174,14 +174,15 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
 	datanode = pb.NewDataNodeClient(conn)
     ctx, cancel = context.WithTimeout(context.Background(), time.Second)
     defer cancel()
-    respuesta, err = datanode.Solicitud_Info_DataNode(ctx, &pb.Id{ListaId: id_2})
+    respuesta2, err := datanode.Solicitud_Info_DataNode(ctx, &pb.Id{ListaId: id_2})
     if err != nil{
-        log.Print("No hay respuesta del datanode2")
+        log.Print("No hay respuesta del Datanode2")
     }else{
-		fmt.Println("Respuesta recibida de DataNode2",respuesta.Datos)
+		fmt.Println("Respuesta recibida de DataNode2",respuesta2.Datos)
         // log.Printf("%s", respuesta.Lista_datos_DataNode)
     }
 
+	respuesta := append(respuesta1, respuesta2...)
 	// return &pb.Lista_Datos_DataNode{[Datos_DataNode:{nombre:aux,apellido:aux}]}, nil
 	return &pb.Lista_Datos_DataNode{Datos:respuesta.Datos}, nil
 }
