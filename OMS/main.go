@@ -57,6 +57,7 @@ func enviarDatosAlDataNode(dataNodeAddr string, id string, informe *pb.Datos) {
     }
     defer conn.Close()
 
+	fmt.Println("Respuesta recibida",id, informe)
     client := pb.NewDataNodeClient(conn)
 
     _, err = client.RegistrarNombre(context.Background(), &pb.Registro{
@@ -106,7 +107,9 @@ func (s *server) Recepcion_Info(ctx context.Context, in *pb.Datos) (*pb.Recepcio
 }
 
 func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*pb.Lista_Datos_DataNode, error) {
-	var estado_persona = in.GetEstado()
+	// var estado_persona = in.GetEstado()
+    var estado_persona = string.ToUpper(in.estado)
+	fmt.Println("Respuesta recibida",estado_persona)
 	var linea_data string
 	var id_1 []string
 	var id_2 []string
@@ -116,10 +119,11 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
 
 	file, err = os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
 
+	fmt.Println("Respuesta recibida in",in)
 	scanner := bufio.NewScanner(file)
     for scanner.Scan() {
 		linea_data = scanner.Text() 
-        fmt.Println(linea_data)
+        // fmt.Println(linea_data)
 		if strings.Contains(linea_data, estado_persona) {
 			if strings.Contains(linea_data, " 1 ") {
 				id_1 = append(id_1,strings.Split(linea_data, " ")[0])
@@ -128,6 +132,9 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
 			}
 		}
     }
+
+	fmt.Println("Respuesta enviada a DataNode1",id_1)
+	fmt.Println("Respuesta enviada a DataNode2",id_2)
 	
 	if err = scanner.Err(); err != nil {
         log.Fatal(err)
@@ -152,7 +159,7 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
     if err != nil{
         log.Print("No hay respuesta del datanode1")
     }else{
-		fmt.Println(respuesta.Datos)
+		fmt.Println("Respuesta recibida de DataNode2",respuesta.Datos)
         // log.Printf("%s", respuesta.Lista_datos_DataNode)
     }
 
@@ -171,7 +178,7 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
     if err != nil{
         log.Print("No hay respuesta del datanode2")
     }else{
-		fmt.Println(respuesta.Datos)
+		fmt.Println("Respuesta recibida de DataNode2",respuesta.Datos)
         // log.Printf("%s", respuesta.Lista_datos_DataNode)
     }
 
