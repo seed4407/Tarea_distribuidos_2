@@ -108,7 +108,7 @@ func (s *server) Recepcion_Info(ctx context.Context, in *pb.Datos) (*pb.Recepcio
 
 func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*pb.Lista_Datos_DataNode, error) {
 	// var estado_persona = in.GetEstado()
-    var estado_persona = string.ToUpper(in.estado)
+    var estado_persona = string.ToUpper(in.Estado)
 	fmt.Println("Respuesta recibida",estado_persona)
 	var linea_data string
 	var id_1 []string
