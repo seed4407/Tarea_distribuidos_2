@@ -1,7 +1,7 @@
 # Variables
-IMAGE_NAME = region
-CONTAINER_NAME = region
-DOCKERFILE = Dockerfile
+IMAGE_NAME = oms
+CONTAINER_NAME = oms
+DOCKERFILE = dockerfile
 
 # Comandos
 build:

@@ -29,6 +29,7 @@ import (
     "os"
 	"bufio"
 	// "math/rand"
+	"sync"
 	"time"
 	"strconv"
 	"google.golang.org/grpc"
@@ -43,6 +44,7 @@ var (
 var id_datos int
 var err error
 var aux string
+var lock = &sync.RWMutex{}
 
 type server struct {
 	pb.UnimplementedNameNodeServer
@@ -68,6 +70,8 @@ func enviarDatosAlDataNode(dataNodeAddr string, id string, informe *pb.Datos) {
 }
 
 func (s *server) Recepcion_Info(ctx context.Context, in *pb.Datos) (*pb.Recepcion, error) {
+	lock.Lock()
+    defer lock.Unlock()
 	var datos_persona = in.GetApellido()
 	var nodo int
 	filePath := "/app/Data.txt"
