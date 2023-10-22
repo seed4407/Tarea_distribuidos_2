@@ -76,13 +76,12 @@ func (s *server) Recepcion_Info(ctx context.Context, in *pb.Datos) (*pb.Recepcio
 	var nodo int
 	filePath := "/app/Data.txt"
 
+	fmt.Println("Respuesta recibida",in)
 	if datos_persona[0] <= 77 {
 		enviarDatosAlDataNode("10.6.46.109:8080",strconv.Itoa(id_datos),in)
-		log.Printf("enviar a datanode1")
 		nodo = 1
 	} else{
 		enviarDatosAlDataNode("10.6.46.110:8080",strconv.Itoa(id_datos),in)
-		log.Printf("enviar a datanode2")
 		nodo = 2
 	}
 
