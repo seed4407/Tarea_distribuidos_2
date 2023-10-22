@@ -119,7 +119,6 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
 
 	file, err = os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
 
-	fmt.Println("Respuesta recibida in",in)
 	scanner := bufio.NewScanner(file)
     for scanner.Scan() {
 		linea_data = scanner.Text() 
@@ -182,9 +181,29 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
         // log.Printf("%s", respuesta.Lista_datos_DataNode)
     }
 
-	respuesta := append(respuesta1, respuesta2...)
+	var respuesta []*pb.Datos_DataNode
+
+	for _, dato := range respuesta1.Datos {
+		persona := &pb.Datos_DataNode{
+			Nombre:   dato.Nombre,
+			Apellido: dato.Apellido,
+		}
+		respuesta = append(respuesta,persona)
+	}
+
+	for _, dato := range respuesta2.Datos {
+		persona := &pb.Datos_DataNode{
+			Nombre:   dato.Nombre,
+			Apellido: dato.Apellido,
+		}
+		respuesta = append(respuesta,persona)
+	}
+
+	// response := &pb.Lista_Datos_DataNode{
+    //     ListaDatos_DataNode: respuesta,
+    // }
 	// return &pb.Lista_Datos_DataNode{[Datos_DataNode:{nombre:aux,apellido:aux}]}, nil
-	return &pb.Lista_Datos_DataNode{Datos:respuesta.Datos}, nil
+	return &pb.Lista_Datos_DataNode{Datos:respuesta}, nil
 }
 
 
