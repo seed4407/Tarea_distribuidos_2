@@ -57,7 +57,11 @@ func enviarDatosAlDataNode(dataNodeAddr string, id string, informe *pb.Datos) {
     }
     defer conn.Close()
 
-	fmt.Println("Dato enviada a DataNode",id, informe)
+	if dataNodeAddr == "10.6.46.109:8080"{
+		fmt.Println("Mensaje enviado a DataNode1",id, informe)
+	} else{
+	    fmt.Println("Mensaje enviado a DataNode2",id, informe)
+	}
     client := pb.NewDataNodeClient(conn)
 
     _, err = client.RegistrarNombre(context.Background(), &pb.Registro{
@@ -77,7 +81,7 @@ func (s *server) Recepcion_Info(ctx context.Context, in *pb.Datos) (*pb.Recepcio
 	var nodo int
 	filePath := "/app/Data.txt"
 
-	fmt.Println("Respuesta recibida",in)
+	fmt.Println("Mensaje recibido de Continente",in)
 	if datos_persona[0] <= 77 {
 		enviarDatosAlDataNode("10.6.46.109:8080",strconv.Itoa(id_datos),in)
 		nodo = 1
@@ -91,7 +95,6 @@ func (s *server) Recepcion_Info(ctx context.Context, in *pb.Datos) (*pb.Recepcio
 
 	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
 
-	//Se escribe en archivo
 	_, err = file.WriteString(dato_escribir + "\n")
 	if err != nil {
 		return nil, err
@@ -107,9 +110,8 @@ func (s *server) Recepcion_Info(ctx context.Context, in *pb.Datos) (*pb.Recepcio
 }
 
 func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*pb.Lista_Datos_DataNode, error) {
-	// var estado_persona = in.GetEstado()
     var estado_persona = strings.ToUpper(in.Estado)
-	fmt.Println("Respuesta recibida",estado_persona)
+	fmt.Println("Mensaje recibido de ONU",estado_persona)
 	var linea_data string
 	var id_1 []string
 	var id_2 []string
@@ -132,8 +134,8 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
 		}
     }
 
-	fmt.Println("Respuesta enviada a DataNode1",id_1)
-	fmt.Println("Respuesta enviada a DataNode2",id_2)
+	fmt.Println("Mensaje enviado a DataNode1",id_1)
+	fmt.Println("Mensaje enviado a DataNode2",id_2)
 	
 	if err = scanner.Err(); err != nil {
         log.Fatal(err)
@@ -158,8 +160,7 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
     if err != nil{
         log.Print("No hay respuesta del datanode1")
     }else{
-		fmt.Println("Respuesta recibida de DataNode1",respuesta1.Datos)
-        // log.Printf("%s", respuesta.Lista_datos_DataNode)
+		fmt.Println("Mensaje recibido de DataNode1",respuesta1.Datos)
     }
 
 	conn, err = grpc.Dial("10.6.46.110:8080",grpc.WithInsecure())
@@ -177,8 +178,7 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
     if err != nil{
         log.Print("No hay respuesta del Datanode2")
     }else{
-		fmt.Println("Respuesta recibida de DataNode2",respuesta2.Datos)
-        // log.Printf("%s", respuesta.Lista_datos_DataNode)
+		fmt.Println("Mensaje recibido de DataNode2",respuesta2.Datos)
     }
 
 	var respuesta []*pb.Datos_DataNode
@@ -199,10 +199,6 @@ func (s *server) ConsultarNombres(ctx context.Context, in *pb.Estado_Persona) (*
 		respuesta = append(respuesta,persona)
 	}
 
-	// response := &pb.Lista_Datos_DataNode{
-    //     ListaDatos_DataNode: respuesta,
-    // }
-	// return &pb.Lista_Datos_DataNode{[Datos_DataNode:{nombre:aux,apellido:aux}]}, nil
 	return &pb.Lista_Datos_DataNode{Datos:respuesta}, nil
 }
 
@@ -231,57 +227,6 @@ func main() {
 		id_datos, err = strconv.Atoi(strings.Split(linea_data, " ")[0])
 		id_datos = id_datos + 1
 	}
-	fmt.Println(id_datos)
-	fmt.Println(id)
-
-	// var file *os.File
-	//Se verifica que archivo este creado
-	// if _, err = os.Stat(filePath); os.IsNotExist(err) {
-	// 	file, err = os.Create(filePath)
-	// 	if err != nil {
-	// 		return 
-	// 	}
-	// 	file.Close()
-	// }
-
-	// //Se abre archivo
-	// file, err := os.OpenFile(filePath, os.O_APPEND|os.O_RDWR|os.O_CREATE, 0644)
-	// file.Close()
-
-	// //Leer linea por linea
-	// file, err = os.OpenFile(filePath, os.O_RDWR|os.O_CREATE, 0644)
-
-	// scanner := bufio.NewScanner(file)
-    // for scanner.Scan() {
-    //     fmt.Println(scanner.Text())
-    // }
-
-	// if err = scanner.Err(); err != nil {
-    //     log.Fatal(err)
-    // }
-
-	// file.Close()
-
-	// var nodo int 
-	// nodo = 1
-	// id_datos = 0
-	// dato_escribir := strconv.Itoa(id_datos) + " " + strconv.Itoa(nodo) + " " +  "infectado"
-	// id_datos = id_datos + 1
-	// fmt.Printf(dato_escribir)
-
-    // // Lee el contenido del archivo
-    // contenido, err := os.ReadFile(filePath)
-    // if err != nil {
-    //     fmt.Printf("Error al leer el archivo: %v\n", err)
-    //     return
-    // }
-
-	// valor_inicial = string(contenido)
-	// fmt.Printf(valor_inicial)
-
-	// if valor_inicial >= 0{
-	// 	log.Printf("Inicio exitoso")
-	// }
 
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d",*port))
 	if err != nil {
